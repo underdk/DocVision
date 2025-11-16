@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}DocVision{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google font (optional) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet"
+    >
+</head>
+<body>
+    <div class="page-root">
+        <header class="navbar">
+            <div class="navbar-left">
+                <div class="logo-mark">◎</div>
+                <div class="logo-text">
+                    <span class="logo-title">DocVision</span>
+                    <span class="logo-subtitle">QR · Signature · Stamp</span>
+                </div>
+            </div>
+            <nav class="navbar-right">
+                <a href="{{ url_for('index') }}" class="nav-link">Dashboard</a>
+                <span class="nav-pill">Beta</span>
+            </nav>
+        </header>
+
+        <main class="main-shell">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

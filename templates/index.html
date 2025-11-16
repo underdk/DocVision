@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}DocVision · Dashboard{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h1 class="panel-title">Your documents</h1>
+            <p class="panel-subtitle">
+                Click a file to open it with QR / signature / stamp detection.
+            </p>
+        </div>
+    </div>
+
+    <div class="file-strip">
+        {% if files %}
+            {% for f in files %}
+                <div class="file-chip">
+                    <div class="file-chip-main">
+                        <div class="file-icon">
+                            {% if f.lower().endswith('.pdf') %}
+                                📕
+                            {% else %}
+                                🖼️
+                            {% endif %}
+                        </div>
+                        <div class="file-text">
+                            <span class="file-name">{{ f }}</span>
+                            <span class="file-meta">Click to open</span>
+                        </div>
+                    </div>
+                    <div class="file-chip-actions">
+                        <a href="{{ url_for('process_image', filename=f) }}" class="btn-ghost">Open</a>
+                        <form action="{{ url_for('delete_file', filename=f) }}" method="post">
+                            <button type="submit" class="btn-icon" title="Delete">✕</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📂</div>
+                <div class="empty-text-main">No files uploaded yet</div>
+                <div class="empty-text-sub">Start by dropping your PDFs or scanned documents below.</div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="panel panel-upload">
+    <div class="panel-header">
+        <h2 class="panel-title-small">Upload documents</h2>
+        <p class="panel-subtitle">You can select many files at once.</p>
+    </div>
+
+    <form action="{{ url_for('index') }}" method="post" enctype="multipart/form-data">
+        <label class="upload-dropzone">
+            <input type="file" name="files" multiple accept="application/pdf,image/*">
+            <div class="upload-icon">⬆️</div>
+            <div class="upload-title">Drop files here or click to browse</div>
+            <div class="upload-subtitle">PDF, PNG, JPG and similar formats are supported</div>
+        </label>
+        <!-- Button kept as backup, but normally you will not need it -->
+        <button type="submit" class="btn-primary upload-button">
+            Upload selected files
+        </button>
+    </form>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropzone = document.querySelector('.upload-dropzone');
+    if (!dropzone) return;
+
+    const input = dropzone.querySelector('input[type="file"]');
+    const titleEl = dropzone.querySelector('.upload-title');
+    const subtitleEl = dropzone.querySelector('.upload-subtitle');
+    const form = dropzone.closest('form');
+
+    if (!input) return;
+
+    input.addEventListener('change', function() {
+        if (!this.files) return;
+        const count = this.files.length;
+
+        if (count === 0) {
+            titleEl.textContent = 'Drop files here or click to browse';
+            subtitleEl.textContent = 'PDF, PNG, JPG and similar formats are supported';
+            dropzone.classList.remove('upload-has-files');
+            return;
+        }
+
+        if (count === 1) {
+            titleEl.textContent = this.files[0].name;
+            subtitleEl.textContent = 'Uploading 1 file…';
+        } else {
+            titleEl.textContent = count + ' files selected';
+            subtitleEl.textContent = 'Uploading ' + count + ' files…';
+        }
+        dropzone.classList.add('upload-has-files');
+
+        // auto–upload after short delay so UI can update
+        if (form) {
+            setTimeout(function() {
+                form.submit();
+            }, 300);
+        }
+    });
+});
+</script>
+{% endblock %}

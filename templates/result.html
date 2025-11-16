@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}DocVision · Results{% endblock %}
+
+{% block content %}
+
+{% if files %}
+<div class="file-strip file-strip-compact">
+    {% for f in files %}
+        <a href="{{ url_for('process_image', filename=f) }}"
+           class="file-pill {% if f == filename %}file-pill-active{% endif %}">
+            <span class="file-pill-icon">
+                {% if f.lower().endswith('.pdf') %}
+                    📕
+                {% else %}
+                    🖼️
+                {% endif %}
+            </span>
+            <span class="file-pill-name">{{ f }}</span>
+        </a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<section class="panel panel-narrow">
+    <div class="panel-header panel-header-row">
+        <div>
+            <h1 class="panel-title">{{ filename }}</h1>
+            <p class="panel-subtitle">
+                Detection is applied automatically using your current settings.
+            </p>
+        </div>
+        <div class="panel-nav-buttons">
+            {% if prev_file %}
+                <a href="{{ url_for('process_image', filename=prev_file) }}" class="btn-ghost">← Previous</a>
+            {% endif %}
+            {% if next_file %}
+                <a href="{{ url_for('process_image', filename=next_file) }}" class="btn-ghost">Next →</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Global detection settings -->
+    <section class="detect-bar">
+        <form method="get"
+              action="{{ url_for('process_image', filename=filename) }}"
+              class="detect-bar-form">
+            <div class="detect-left">
+                <div class="detect-label">Detect globally:</div>
+
+                <!-- qr -->
+                <input type="hidden" name="qr" value="0">
+                <label class="detect-chip">
+                    <input type="checkbox" name="qr" value="1" {% if highlight_qr %}checked{% endif %}>
+                    <span class="detect-chip-inner">
+                        <span class="detect-icon">▢</span>
+                        <span class="detect-text-main">QR codes</span>
+                        <span class="detect-text-sub">Codes and squares</span>
+                    </span>
+                </label>
+
+                <!-- signature -->
+                <input type="hidden" name="sig" value="0">
+                <label class="detect-chip">
+                    <input type="checkbox" name="sig" value="1" {% if highlight_sig %}checked{% endif %}>
+                    <span class="detect-chip-inner">
+                        <span class="detect-icon">✒️</span>
+                        <span class="detect-text-main">Signatures</span>
+                        <span class="detect-text-sub">Handwritten marks</span>
+                    </span>
+                </label>
+
+                <!-- stamp -->
+                <input type="hidden" name="stamp" value="0">
+                <label class="detect-chip">
+                    <input type="checkbox" name="stamp" value="1" {% if highlight_stamp %}checked{% endif %}>
+                    <span class="detect-chip-inner">
+                        <span class="detect-icon">🔴</span>
+                        <span class="detect-text-main">Stamps</span>
+                        <span class="detect-text-sub">Official seals</span>
+                    </span>
+                </label>
+            </div>
+
+            <div class="detect-right">
+                <!-- Clear button: disables all three and submits -->
+                <a href="{{ url_for('process_image', filename=filename) }}?qr=0&sig=0&stamp=0"
+                   class="btn-ghost detect-clear">
+                    Clear
+                </a>
+
+                <button type="submit" class="btn-primary detect-run">
+                    Update detection
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Preview of processed pages -->
+    <div class="page-grid">
+        {% for img in images %}
+            <div class="page-card">
+                <div class="page-frame">
+                    <img src="data:image/png;base64,{{ img }}" alt="Processed page">
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

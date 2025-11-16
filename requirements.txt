@@ -1,0 +1,6 @@
+Flask
+Pillow
+qrcode
+opencv-python-headless
+ultralytics
+PyMuPDF
